@@ -165,6 +165,13 @@ export interface WebviewMessage {
 		| "dismissUpsell"
 		| "getDismissedUpsells"
 		| "updateSettings"
+		| "allowedCommands"
+		| "deniedCommands"
+		| "killBrowserSession"
+		| "openBrowserSessionPanel"
+		| "showBrowserSessionPanelAtStep"
+		| "refreshBrowserSessionPanel"
+		| "browserPanelDidLaunch"
 	text?: string
 	editedMessageContent?: string
 	tab?: "settings" | "history" | "mcp" | "modes" | "chat" | "marketplace" | "cloud"
@@ -176,6 +183,9 @@ export interface WebviewMessage {
 	images?: string[]
 	bool?: boolean
 	value?: number
+	stepIndex?: number
+	isLaunchAction?: boolean
+	forceShow?: boolean
 	commands?: string[]
 	audioType?: AudioType
 	serverName?: string
