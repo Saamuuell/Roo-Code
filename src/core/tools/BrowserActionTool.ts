@@ -1,3 +1,5 @@
+import { Anthropic } from "@anthropic-ai/sdk"
+
 import { Task } from "../task/Task"
 import { ToolUse, AskApproval, HandleError, PushToolResult, RemoveClosingTag } from "../../shared/tools"
 import {
@@ -7,7 +9,6 @@ import {
 	ClineSayBrowserAction,
 } from "../../shared/ExtensionMessage"
 import { formatResponse } from "../prompts/responses"
-import { Anthropic } from "@anthropic-ai/sdk"
 
 /**
  * Parses coordinate string and scales from image dimensions to viewport dimensions
@@ -42,7 +43,7 @@ function scaleCoordinate(coordinate: string, viewportWidth: number, viewportHeig
 	return `${scaledX},${scaledY}`
 }
 
-export async function browserActionTool(
+async function runBrowserActionTool(
 	cline: Task,
 	block: ToolUse,
 	askApproval: AskApproval,
@@ -193,6 +194,7 @@ export async function browserActionTool(
 				if ((action === "click" || action === "hover") && processedCoordinate) {
 					sayPayload.executedCoordinate = processedCoordinate
 				}
+
 				await cline.say("browser_action", JSON.stringify(sayPayload), undefined, false)
 
 				switch (action) {
@@ -287,4 +289,25 @@ export async function browserActionTool(
 		await handleError("executing browser action", error)
 		return
 	}
+}
+
+/**
+ * Adapter export to match the common .handle(...) pattern used in presentAssistantMessage.
+ */
+export const browserActionTool = {
+	handle: (
+		cline: Task,
+		block: ToolUse,
+		{
+			askApproval,
+			handleError,
+			pushToolResult,
+			removeClosingTag,
+		}: {
+			askApproval: AskApproval
+			handleError: HandleError
+			pushToolResult: PushToolResult
+			removeClosingTag: RemoveClosingTag
+		},
+	) => runBrowserActionTool(cline, block, askApproval, handleError, pushToolResult, removeClosingTag),
 }
